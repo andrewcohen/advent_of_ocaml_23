@@ -39,9 +39,9 @@ let get_digits line =
 
   int_of_string (Printf.sprintf "%c%c" first last)
 
-let main () =
+let run () =
   (* let file = "./lib/day_1/sample2.txt" in *)
-  let file = "./lib/day_1/input.txt" in
+  let file = "./inputs/day_01/input.txt" in
   let lines = Util.read_lines file in
   let sum_digits = List.fold_left (fun acc l -> acc + get_digits l) 0 in
   sum_digits lines |> string_of_int |> print_endline
