@@ -1,4 +1,5 @@
 (executable
  (public_name advent_of_caml_23)
  (name main)
- (libraries advent_of_caml_23))
+ (libraries advent_of_caml_23)
+ (preprocess (pps ppx_deriving.show)))

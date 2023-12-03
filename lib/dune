@@ -1,2 +1,5 @@
 (library
- (name advent_of_caml_23))
+ (name advent_of_caml_23)
+ (libraries base stdio)
+ (preprocess
+  (pps ppx_deriving.show)))
