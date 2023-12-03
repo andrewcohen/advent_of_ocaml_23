@@ -57,7 +57,7 @@ let are_any_neighbors_symbol ~i ~row ~prev ~next =
 
 type maybe_part = { number : int; valid : bool } [@@deriving show]
 
-let rec do_row ~acc ~col ~row ~prev ~next ~sum =
+let rec part_number_total_in_row ~acc ~col ~row ~prev ~next ~sum =
   let cur = List.nth row col in
   match cur with
   | Some cur ->
@@ -75,18 +75,10 @@ let rec do_row ~acc ~col ~row ~prev ~next ~sum =
       let n =
         cur |> String.of_char |> fun x -> try Int.of_string x with _ -> 0
       in
-      (* Fmt.pr *)
-      (* "'%c' curr: %i, n: %i | digit? %b, first? %b, last? %b nvalid?: %b/%b\n\ *)
-         (*   \           %s \n" *)
-      (*   cur acc.number n is_digit is_first_digit is_last_digit *)
-      (*   (are_any_neighbors_symbol ~i:col ~row ~prev ~next) *)
-      (*   valid (show_maybe_part acc); *)
       let number =
         match (is_digit, is_first_digit, is_last_digit) with
         | true, true, true -> n
-        | true, true, false -> (acc.number * 10) + n
-        | true, false, true -> (acc.number * 10) + n
-        | true, false, false -> (acc.number * 10) + n
+        | true, _, _ -> (acc.number * 10) + n
         | false, false, false -> acc.number
         | _ ->
             failwith
@@ -95,15 +87,14 @@ let rec do_row ~acc ~col ~row ~prev ~next ~sum =
       in
 
       if not is_digit then
-        (* Fmt.pr "%s \n" (show_maybe_part acc); *)
         let sum = if acc.valid then sum + acc.number else sum in
         (* reset *)
-        do_row
+        part_number_total_in_row
           ~acc:{ valid = false; number = 0 }
           ~col:(col + 1) ~row ~prev ~next ~sum
-      else if is_first_digit then
-        do_row ~acc:{ valid; number } ~col:(col + 1) ~row ~prev ~next ~sum
-      else do_row ~acc:{ valid; number } ~col:(col + 1) ~row ~prev ~next ~sum
+      else
+        part_number_total_in_row ~acc:{ valid; number } ~col:(col + 1) ~row
+          ~prev ~next ~sum
   | None -> if acc.valid then sum + acc.number else sum
 
 let run () =
@@ -116,7 +107,9 @@ let run () =
       ~f:(fun idx row ->
         let prev = List.nth grid (idx - 1) in
         let next = List.nth grid (idx + 1) in
-        do_row ~acc:{ number = 0; valid = false } ~col:0 ~row ~prev ~next ~sum:0)
+        part_number_total_in_row
+          ~acc:{ number = 0; valid = false }
+          ~col:0 ~row ~prev ~next ~sum:0)
       grid
   in
 
@@ -136,6 +129,9 @@ let acc = { number = 0; valid = false }
 let%test "edge and below" =
   let row = "..123" |> String.to_list in
   let after = "....#" |> String.to_list in
-  let subject = do_row ~acc ~col:0 ~row ~prev:None ~next:(Some after) ~sum:0 in
+  let subject =
+    part_number_total_in_row ~acc ~col:0 ~row ~prev:None ~next:(Some after)
+      ~sum:0
+  in
   Fmt.pr "got %i \n" subject;
   Int.equal subject 123
