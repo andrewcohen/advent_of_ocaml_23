@@ -1,5 +1,6 @@
 (library
  (name advent_of_caml_23)
- (libraries base stdio)
+ (libraries base stdio fmt)
+ (inline_tests)
  (preprocess
-  (pps ppx_deriving.show)))
+  (pps ppx_deriving.show ppx_inline_test)))
